@@ -39,7 +39,7 @@ bool Game::checkEnding() {
         return true;
     }
 
-    if (player.time >= 6 * 60) {
+    if (player.time >= (24 * 60 + 6 * 60)) {
         std::cout << "\nТы дожил до утра! Победа!\n";
         return true;
     }

@@ -2,7 +2,7 @@
 #include <iostream>
 
 void drawUI(const Player& p) {
-    int hours = p.time / 60;
+    int hours = (p.time / 60) % 24;
     int minutes = p.time % 60;
 
     std::cout << "\n===== DRUNKEN COMPILER =====\n";
