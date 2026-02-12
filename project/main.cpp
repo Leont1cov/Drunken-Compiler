@@ -2,121 +2,196 @@
 #include <cstdlib>
 #include <ctime>
 
-struct Player {
-    int hp;
-    float bac;
-    int money;
-    int time;      // минуты с начала дня
-    int drinks;    // сколько выпито
-};
-
-void drawUI(const Player& p) {
-    int hours = (p.time / 60) % 24;
-    int minutes = p.time % 60;
-
-    std::cout << "\n===== DRUNKEN COMPILER =====\n";
-    std::cout << "Время: " << hours << ":";
-    if (minutes < 10) std::cout << "0";
-    std::cout << minutes << "\n";
-
-    std::cout << "HP: " << p.hp << "\n";
-    std::cout << "BAC: " << p.bac << "\n";
-    std::cout << "Money: " << p.money << "\n";
+void printBar() {
+    std::cout << "\n====================================\n";
+    std::cout << "        (╯°□°）╯︵ ┻━┻\n";
+    std::cout << "          DRUNKEN COMPILER\n";
+    std::cout << "====================================\n";
 }
 
-bool checkEnding(const Player& p) {
-    if (p.hp <= 0) {
-        std::cout << "\n💀 Печень сказала: «Я увольняюсь».\n";
-        std::cout << "Ты больше не можешь продолжать эту ночь.\n";
-        return true;
-    }
-
-    if (p.bac >= 4.0f) {
-        std::cout << "\n💀 Ты перепил.\n";
-        std::cout << "Сознание отключилось раньше, чем компилятор.\n";
-        return true;
-    }
-
-    if (p.bac <= 0.0f) {
-        std::cout << "\n💀 Слишком трезвый.\n";
-        std::cout << "Тебе стало скучно, и ты ушёл домой.\n";
-        return true;
-    }
-
-    if (p.money <= 0) {
-        std::cout << "\n💀 Деньги закончились.\n";
-        std::cout << "Вышибала мягко (но уверенно) показал тебе выход.\n";
-        return true;
-    }
-
-    if (p.time >= 24 * 60 + 6 * 60) {
-        std::cout << "\n🌅 Наступило 06:00!\n";
-        std::cout << "Ты пережил эту ночь.\n\n";
-
-        std::cout << "Статистика:\n";
-        std::cout << "Выпито напитков: " << p.drinks << "\n";
-        std::cout << "Денег осталось: " << p.money << "\n";
-
-        if (p.bac > 1.0f && p.bac < 3.0f)
-            std::cout << "Статус: Senior Drinker 😎\n";
-        else
-            std::cout << "Статус: Junior Trainee 😅\n";
-
-        return true;
-    }
-
-    return false;
+void printSunrise() {
+    std::cout << "\n\n";
+    std::cout << "        \\  |  /\n";
+    std::cout << "      --  ☀  --\n";
+    std::cout << "        /  |  \\\n";
+    std::cout << "\nТы дожил до рассвета!\n";
 }
 
-int main() {
-    std::srand(std::time(0));
+void randomEvent(int& hp, float& bac, int& money, int& fights) {
+    int chance = std::rand() % 100;
 
-    Player player = {100, 0.5f, 100, 22 * 60, 0};
-
-    while (true) {
-
-        drawUI(player);
-
-        if (checkEnding(player))
-            break;
-
-        std::cout << "\n1 - Выпить пиво\n";
-        std::cout << "2 - Закусить\n";
-        std::cout << "3 - Ждать\n";
-        std::cout << "0 - Выйти\n";
-        std::cout << "> ";
+    if (chance < 25) {
+        std::cout << "\nК тебе подсаживается программист.\n";
+        std::cout << "— Табы или пробелы?\n";
+        std::cout << "1) Табы\n2) Пробелы\n";
 
         int choice;
         std::cin >> choice;
 
         if (choice == 1) {
-            int minutes = 15 + std::rand() % 16; // 15–30 минут
-            player.time += minutes;
-            player.bac += 0.3f;
-            player.money -= 10;
-            player.drinks++;
-            std::cout << "Ты выпил. Прошло " << minutes << " минут.\n";
-        }
-        else if (choice == 2) {
-            player.hp += 10;
-            if (player.hp > 100) player.hp = 100;
-            player.money -= 5;
-            player.time += 10;
-            std::cout << "Ты поел.\n";
-        }
-        else if (choice == 3) {
-            player.bac -= 0.2f;
-            if (player.bac < 0) player.bac = 0;
-            player.time += 10;
-            std::cout << "Ты просто сидишь.\n";
-        }
-        else if (choice == 0) {
-            break;
+            std::cout << "Он одобрительно кивает.\n";
         }
         else {
-            std::cout << "Неверный ввод.\n";
+            std::cout << "Он злится! Минус 15 HP.\n";
+            hp -= 15;
+            fights++;
         }
     }
+    else if (chance < 40) {
+        std::cout << "\nБармен ставит бесплатный шот.\n";
+        std::cout << "1) Выпить\n2) Отказаться\n";
 
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 1) {
+            std::cout << "Ты рискнул...\n";
+            bac += 0.7f;
+        }
+        else {
+            std::cout << "Бармен пожал плечами.\n";
+        }
+    }
+}
+
+int main() {
+
+    std::srand(std::time(0));
+
+    int hp = 100;
+    float bac = 0.5f;
+    int money = 100;
+
+    int hour = 22;
+    int minutes = 0;
+    bool afterMidnight = false;
+
+    int liters = 0;
+    int fights = 0;
+    int foodBuff = 0;
+
+    while (true) {
+
+        system("cls"); // Очистка консоли
+
+        printBar();
+
+        std::cout << "HP: " << hp
+            << "  BAC: " << bac
+            << "  $: " << money << "\n";
+
+        std::cout << "Время: ";
+        if (hour < 10) std::cout << "0";
+        std::cout << hour << ":";
+        if (minutes < 10) std::cout << "0";
+        std::cout << minutes << "\n";
+
+        std::cout << "\n1) Пиво (20$)\n";
+        std::cout << "2) Виски (40$)\n";
+        std::cout << "3) Чебурек (25$)\n";
+        std::cout << "4) Ничего не делать\n";
+        std::cout << "5) Выйти\n";
+
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 5) {
+            std::cout << "Ты решил уйти.\n";
+            break;
+        }
+
+        if (choice == 1 && money >= 20) {
+            money -= 20;
+            liters++;
+            if (foodBuff > 0)
+                bac += 0.2f;
+            else
+                bac += 0.4f;
+            minutes += 20;
+        }
+        else if (choice == 2 && money >= 40) {
+            money -= 40;
+            liters++;
+            if (foodBuff > 0)
+                bac += 0.4f;
+            else
+                bac += 0.8f;
+            minutes += 25;
+        }
+        else if (choice == 3 && money >= 25) {
+            money -= 25;
+            hp += 15;
+            if (hp > 100) hp = 100;
+            foodBuff = 3;
+            minutes += 15;
+            std::cout << "Ты съел чебурек. Защита на 3 хода.\n";
+            system("pause");
+        }
+        else if (choice == 4) {
+            minutes += 15;
+            bac -= 0.2f;
+            if (bac < 0) bac = 0;
+        }
+        else {
+            std::cout << "Недостаточно денег!\n";
+            system("pause");
+            continue;
+        }
+
+        if (foodBuff > 0)
+            foodBuff--;
+
+        while (minutes >= 60) {
+            minutes -= 60;
+            hour++;
+        }
+
+        if (hour >= 24) {
+            hour = 0;
+            afterMidnight = true;
+        }
+
+        randomEvent(hp, bac, money, fights);
+
+        if (hp <= 0) {
+            std::cout << "\nПечень не выдержала.\n";
+            break;
+        }
+
+        if (bac >= 4.0f) {
+            std::cout << "\nТы перепил. Игра окончена.\n";
+            break;
+        }
+
+        if (bac <= 0.0f) {
+            std::cout << "\nСлишком трезво. Стало грустно.\n";
+            break;
+        }
+
+        if (money <= 0) {
+            std::cout << "\nДеньги закончились. Тебя вывели из бара.\n";
+            break;
+        }
+
+        if (afterMidnight && hour >= 6) {
+            printSunrise();
+
+            std::cout << "\n===== СТАТИСТИКА =====\n";
+            std::cout << "Выпито: " << liters << "\n";
+            std::cout << "Драк: " << fights << "\n";
+            std::cout << "Денег осталось: " << money << "\n";
+
+            if (bac > 1.5f && bac < 3.0f)
+                std::cout << "Статус: Senior Drinker\n";
+            else
+                std::cout << "Статус: Junior Trainee\n";
+
+            break;
+        }
+
+        system("pause");
+    }
+
+    std::cout << "\nHave a nice compile.\n";
     return 0;
 }
