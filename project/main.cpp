@@ -18,38 +18,117 @@ void printSunrise() {
 }
 
 void randomEvent(int& hp, float& bac, int& money, int& fights) {
+
     int chance = std::rand() % 100;
 
-    if (chance < 25) {
-        std::cout << "\nК тебе подсаживается программист.\n";
-        std::cout << "— Табы или пробелы?\n";
-        std::cout << "1) Табы\n2) Пробелы\n";
+    if (chance < 40) {
 
-        int choice;
-        std::cin >> choice;
+        int level = std::rand() % 3; // 0 - junior, 1 - middle, 2 - senior
 
-        if (choice == 1) {
-            std::cout << "Он одобрительно кивает.\n";
+        std::cout << "\n";
+
+        if (level == 0)
+            std::cout << "🟢 Junior-программист подходит к тебе.\n";
+        else if (level == 1)
+            std::cout << "🟡 Middle-программист оценивающе смотрит.\n";
+        else
+            std::cout << "🔴 Senior-программист медленно поворачивается...\n";
+
+        int question = std::rand() % 3;
+        int damage = 5;
+
+        if (level == 1) damage = 10;
+        if (level == 2) damage = 20;
+
+        int answer;
+        int correctAnswer = 0;
+
+        // ================= JUNIOR =================
+        if (level == 0) {
+
+            if (question == 0) {
+                std::cout << "Что такое переменная?\n";
+                std::cout << "1) Контейнер для данных\n2) Цикл\n3) Ошибка\n";
+                correctAnswer = 1;
+            }
+            else if (question == 1) {
+                std::cout << "Что выведет: 5 + 5 ?\n";
+                std::cout << "1) 55\n2) 10\n3) 5\n";
+                correctAnswer = 2;
+            }
+            else {
+                std::cout << "Что такое console.log?\n";
+                std::cout << "1) Вывод в консоль\n2) Ошибка\n3) Тип данных\n";
+                correctAnswer = 1;
+            }
+        }
+
+        // ================= MIDDLE =================
+        else if (level == 1) {
+
+            if (question == 0) {
+                std::cout << "Что делает оператор new в C++?\n";
+                std::cout << "1) Удаляет память\n2) Выделяет память в куче\n3) Создает цикл\n";
+                correctAnswer = 2;
+            }
+            else if (question == 1) {
+                std::cout << "Разница между == и === в JS?\n";
+                std::cout << "1) Нет разницы\n2) === проверяет тип\n3) === быстрее\n";
+                correctAnswer = 2;
+            }
+            else {
+                std::cout << "Что такое указатель?\n";
+                std::cout << "1) Адрес переменной\n2) Цикл\n3) Функция\n";
+                correctAnswer = 1;
+            }
+        }
+
+        // ================= SENIOR =================
+        else {
+
+            if (question == 0) {
+                std::cout << "Что такое RAII в C++?\n";
+                std::cout << "1) Управление ресурсами через объект\n2) Тип цикла\n3) Шаблон функции\n";
+                correctAnswer = 1;
+            }
+            else if (question == 1) {
+                std::cout << "Что выведет typeof null в JS?\n";
+                std::cout << "1) null\n2) object\n3) undefined\n";
+                correctAnswer = 2;
+            }
+            else {
+                std::cout << "Что делает virtual в C++?\n";
+                std::cout << "1) Запрещает наследование\n2) Включает полиморфизм\n3) Удаляет функцию\n";
+                correctAnswer = 2;
+            }
+        }
+
+        std::cin >> answer;
+
+        if (answer == correctAnswer) {
+            int reward = 5 + std::rand() % 11; // 5-15$
+            money += reward;
+            std::cout << "✅ Правильно! Он уважительно кивает.\n";
+            std::cout << "💵 Ты получил +" << reward << "$\n";
         }
         else {
-            std::cout << "Он злится! Минус 15 HP.\n";
-            hp -= 15;
-            fights++;
+            hp -= damage;
+            std::cout << "❌ Неверно. Он разочарован.\n";
+            std::cout << "💔 -" << damage << " HP\n";
         }
+
+        fights++;
     }
-    else if (chance < 40) {
-        std::cout << "\nБармен ставит бесплатный шот.\n";
-        std::cout << "1) Выпить\n2) Отказаться\n";
 
+    else if (chance < 55) {
+        std::cout << "\n🍸 Бармен ставит бесплатный шот.\n";
+        std::cout << "1) Выпить\n2) Отказаться\n";
         int choice;
         std::cin >> choice;
 
         if (choice == 1) {
-            std::cout << "Ты рискнул...\n";
             bac += 0.7f;
-        }
-        else {
-            std::cout << "Бармен пожал плечами.\n";
+            std::cout << "Ты рискнул.\n";
         }
     }
 }
