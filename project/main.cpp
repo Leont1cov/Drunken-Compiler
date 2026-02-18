@@ -175,8 +175,19 @@ void unpredictableRandomEvent(int& hp, float& bac, int& money, int& fights, int 
         std::cin >> c;
         if (c == 1 && money >= stake) {
             money -= stake;
-            if (std::rand() % 100 < 45) money += stake * (2 + std::rand() % 2);
-            else hp -= 6 + std::rand() % 10;
+            if (std::rand() % 100 < 45) {
+                int gain = stake * (2 + std::rand() % 2);
+                money += gain;
+                std::cout << "Ставка сыграла! Выигрыш: +" << gain << "$\n";
+            } else {
+                int dmg = 6 + std::rand() % 10;
+                hp -= dmg;
+                std::cout << "Ставка не зашла. Тебя задело в толпе: -" << dmg << " HP\n";
+            }
+        } else if (c == 1) {
+            std::cout << "Недостаточно денег для ставки.\n";
+        } else {
+            std::cout << "Ты не стал рисковать деньгами.\n";
         }
     } else {
         int stress = 4 + std::rand() % 12;
@@ -188,17 +199,54 @@ void unpredictableRandomEvent(int& hp, float& bac, int& money, int& fights, int 
     normalizeStats(hp, bac, money);
 }
 
+bool rollBossSpawn(bool alreadySpawned, int chancePercent) {
+    if (alreadySpawned || chancePercent <= 0) {
+        return false;
+    }
+    if (chancePercent > 100) {
+        chancePercent = 100;
+    }
+    return (std::rand() % 100) < chancePercent;
+}
+
 void randomEvent(int& hp, float& bac, int& money, int& fights,
                  bool& guru, bool& sage,
                  bool& l1, bool& l2, bool& l3,
                  bool& designBoss,
                  bool afterMidnight, int hour) {
-    if (!guru && fights >= 3) { guru = true; runBossBattle("Гуру Кода", hp, bac, money, fights); return; }
-    if (!l1 && fights >= 5) { l1 = true; runBossBattle("Legacy Code I", hp, bac, money, fights, 1); return; }
-    if (!sage && afterMidnight && hour >= 1) { sage = true; runBossBattle("Духовный Мудрец", hp, bac, money, fights); return; }
-    if (!l2 && afterMidnight && hour >= 2) { l2 = true; runBossBattle("Legacy Code II", hp, bac, money, fights, 2); return; }
-    if (!designBoss && afterMidnight && hour >= 4 && fights >= 8) { designBoss = true; runBossBattle("Босс Дизайнеров", hp, bac, money, fights); return; }
-    if (!l3 && afterMidnight && hour >= 5) { l3 = true; runBossBattle("Legacy Code III", hp, bac, money, fights, 3); return; }
+    int bossGate = std::rand() % 100;
+    if (bossGate < 28) {
+        if (fights >= 3 && rollBossSpawn(guru, 14 + fights * 2)) {
+            guru = true;
+            runBossBattle("Гуру Кода", hp, bac, money, fights);
+            return;
+        }
+        if (fights >= 5 && rollBossSpawn(l1, 12 + fights * 2)) {
+            l1 = true;
+            runBossBattle("Legacy Code I", hp, bac, money, fights, 1);
+            return;
+        }
+        if (afterMidnight && hour >= 1 && rollBossSpawn(sage, 16 + hour * 3)) {
+            sage = true;
+            runBossBattle("Духовный Мудрец", hp, bac, money, fights);
+            return;
+        }
+        if (afterMidnight && hour >= 2 && rollBossSpawn(l2, 11 + hour * 3)) {
+            l2 = true;
+            runBossBattle("Legacy Code II", hp, bac, money, fights, 2);
+            return;
+        }
+        if (afterMidnight && hour >= 4 && fights >= 8 && rollBossSpawn(designBoss, 10 + fights)) {
+            designBoss = true;
+            runBossBattle("Босс Дизайнеров", hp, bac, money, fights);
+            return;
+        }
+        if (afterMidnight && hour >= 5 && rollBossSpawn(l3, 12 + hour * 4)) {
+            l3 = true;
+            runBossBattle("Legacy Code III", hp, bac, money, fights, 3);
+            return;
+        }
+    }
 
     int chance = std::rand() % 100;
 
@@ -227,14 +275,25 @@ void randomEvent(int& hp, float& bac, int& money, int& fights,
         }
 
         std::cin >> ans;
-        if (ans == correct) money += 4 + std::rand() % 10;
-        else { hp -= damage; }
+        if (ans == correct) {
+            int reward = 4 + std::rand() % 10;
+            money += reward;
+            std::cout << "Верный ответ! +" << reward << "$\n";
+        } else {
+            hp -= damage;
+            std::cout << "Неверно. -" << damage << " HP\n";
+        }
         fights++;
     } else if (chance < 45) {
         std::cout << "Бесплатный шот: 1) Выпить  2) Отказаться\n";
         int c = 2;
         std::cin >> c;
-        if (c == 1) { bac += 0.7f; }
+        if (c == 1) {
+            bac += 0.7f;
+            std::cout << "Ты выпил шот. BAC резко вырос.\n";
+        } else {
+            std::cout << "Ты отказался от шота. Разумный выбор.\n";
+        }
     } else if (chance < 63) {
         std::cout << "Случайный дизайнер тянется к кошельку!\n";
         std::cout << "Выбери действие: 1) Левый хук  2) Правый хук  3) Пинок по макету\n";
@@ -298,18 +357,20 @@ int main() {
 
         int choice = 0;
         std::cin >> choice;
-        if (choice == 5) break;
+        if (choice == 5) { std::cout << "Ты решил уйти.\n"; break; }
 
         if (choice == 1 && money >= 20) {
             money -= 20;
             liters++;
             bac += (foodBuff > 0) ? 0.2f : 0.4f;
             minutes += 20;
+            std::cout << "Ты выпил пиво. +BAC и -20$.\n";
         } else if (choice == 2 && money >= 40) {
             money -= 40;
             liters++;
             bac += (foodBuff > 0) ? 0.4f : 0.8f;
             minutes += 25;
+            std::cout << "Ты выпил виски. Крепко! +BAC и -40$.\n";
         } else if (choice == 3 && money >= 25) {
             money -= 25;
             hp += 15;
@@ -320,7 +381,9 @@ int main() {
         } else if (choice == 4) {
             minutes += 15;
             bac -= 0.2f;
+            std::cout << "Ты немного перевел дух. BAC снизился.\n";
         } else {
+            std::cout << "Недостаточно денег или неверный выбор.\n";
             waitForEnter();
             continue;
         }
@@ -350,6 +413,8 @@ int main() {
             std::cout << "Выпито: " << liters << "\n";
             std::cout << "Драк/схваток: " << fights << "\n";
             std::cout << "Денег: " << money << "\n";
+            std::cout << "Финальный BAC: " << bac << "\n";
+            std::cout << "Статус: " << (bac < 1.5f ? "Junior" : "Senior") << "\n";
             std::cout << "Гуру Кода: " << (guru ? "встречен" : "нет") << "\n";
             std::cout << "Духовный Мудрец: " << (sage ? "встречен" : "нет") << "\n";
             std::cout << "Босс Дизайнеров: " << (designBoss ? "встречен" : "нет") << "\n";
